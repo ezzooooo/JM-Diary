@@ -7,6 +7,8 @@
 #include <time.h>
 #include <string.h>
 
+void calendar();
+ 
 int main(int argc, char *argv[]) {
 	int opt_a = 0;
 	int opt_c = 0;
@@ -72,4 +74,45 @@ int main(int argc, char *argv[]) {
 		close(fd);
 	}
 	return 0;
+}
+
+void calendar(){
+	//각 월별 날짜 수 저장
+	int month[12]={31,0,31,30,31,30,31,31,30,31,30,31};
+	int i,j,d,k;
+	int totalday=0;
+	int h=1;
+
+	int year=tm_year+1900;
+	int month=tm->tm_mon+1;
+
+	printf("%10d 년 %3d 월 \n", year, mon);
+	printf("----------------------------------\n");
+	printf("  일  월  화  수  목  금  토  일  \n");
+	printf("----------------------------------\n");
+	//윤년 체크
+	if(year%4==0&&year%100!=0||year%400==0){
+		month[1]=29;
+	}
+	else month[1]=28;
+	
+	//시작일
+	totalday = (year-1)*365+(year-1)/4-(year-1)/100+(year-1)/400;
+	for(k=1;k<=mon-1;k++){
+		totalday=totalday+month[k-1];
+	}
+	//출력
+	for(i=1; i<=6; i++){
+		for(j=1;j<=7;j++,h++){
+			if(h<=onth[mon-1]+1+totalday%7){
+				d=h-totalday%7;
+				if(d-1<=0)
+					printf("	");
+				else
+					printf("%4d", d-1);
+			}
+		}
+		printf("\n");
+	}
+	printf("\n");
 }
