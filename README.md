@@ -1,6 +1,6 @@
 # JM-Diary
-abcdefg
-aaaaa
-hi ezzooooo
-hi hyemin
-push han da
+TeamMember: JooWon Lee & Hyemin Noh
+
+Our Team makes Diary Program.
+
+Thank you :)
