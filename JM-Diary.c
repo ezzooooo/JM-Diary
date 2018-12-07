@@ -1,4 +1,4 @@
-﻿#include <stdio.h>
+#include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
         return 0;
     }
     else {
-        while( (option = getopt(argc, argv, "caedf") ) != -1) {
+        while( (option = getopt(argc, argv, "ca:edf") ) != -1) {
             switch(option) {
                 case 'c':
                     opt_c++;
@@ -58,21 +58,52 @@ int main(int argc, char *argv[]) {
     }
 
     if(opt_a) {
-        t = time(NULL);
-        tm = localtime(&t);
-        printf("%s\n", buf);
-        sprintf(file_name,"%d-%d.txt", tm->tm_year+1900, tm->tm_mon+1);
-        fd = open(file_name, O_CREAT | O_APPEND | O_WRONLY , mode);
-        if (fd == -1) {
-            perror("오픈 에러");
-            exit(1);
-        }
-        sprintf(buf,"%d-%d-%d %d:%d %s\n", tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday, tm->tm_hour, tm->tm_min, argv[2]);
-        if (write(fd, buf, strlen(buf)+1) != strlen(buf)+1)
-            perror("쓰기 오류");
-
-        close(fd);
-    } else if(opt_c) {
+		switch(argc)
+		{
+			case 3:
+				t = time(NULL);
+				tm = localtime(&t);
+				sprintf(file_name,"%04d-%02d.txt", tm->tm_year+1900, tm->tm_mon+1);
+				fd = open(file_name, O_CREAT | O_APPEND | O_WRONLY , mode);
+				if (fd == -1) {
+					perror("오픈 에러");
+					exit(1);
+				}
+				sprintf(buf,"%04d-%02d-%02d %02d:%02d %s\n", 
+						tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday, 
+						tm->tm_hour, tm->tm_min, argv[2]);
+				if (write(fd, buf, strlen(buf)+1) != strlen(buf)+1)
+					perror("쓰기 오류");
+				close(fd);
+				break;
+			case 4:
+				sprintf(file_name,"%c%c%c%c-%c%c.txt", 
+						argv[2][0],argv[2][1], argv[2][2], argv[2][3], argv[2][5], argv[2][6]);
+				fd = open(file_name, O_CREAT | O_APPEND | O_WRONLY , mode);
+				if (fd == -1) {
+					perror("오픈 에러");
+					exit(1);
+				}
+				sprintf(buf,"%s 09:00 %s\n", argv[2], argv[3]);
+				if (write(fd, buf, strlen(buf)+1) != strlen(buf)+1)
+					perror("쓰기 오류");
+				close(fd);
+				break;
+			case 5:
+				sprintf(file_name,"%c%c%c%c-%c%c.txt", 
+						argv[2][0],argv[2][1], argv[2][2], argv[2][3], argv[2][5], argv[2][6]);
+				fd = open(file_name, O_CREAT | O_APPEND | O_WRONLY , mode);
+				if (fd == -1) {
+					perror("오픈 에러");
+					exit(1);
+				}
+				sprintf(buf,"%s %s %s\n", argv[2], argv[3], argv[4]);
+				if (write(fd, buf, strlen(buf)+1) != strlen(buf)+1)
+					perror("쓰기 오류");
+				close(fd);
+				break;
+		}
+	} else if(opt_c) {
         calendar();
     }
     return 0;
@@ -122,3 +153,4 @@ void calendar(){
     }
     printf("\n");
 }
+
