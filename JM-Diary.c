@@ -7,56 +7,57 @@
 #include <time.h>
 #include <string.h>
 
+void calendar();
+
 int main(int argc, char *argv[]) {
-	int opt_a = 0;
-	int opt_c = 0;
-	int opt_d = 0;
-	int opt_e = 0;
-	int opt_f = 0;
-	int option = 0;
-	int fd;
-	struct tm *tm;
-	time_t t;
-	char buf[257]= {0};
-	int len;
-	char file_name[50] = {0};
-	char content[100] = {0};
+    int opt_a = 0;
+    int opt_c = 0;
+    int opt_d = 0;
+    int opt_e = 0;
+    int opt_f = 0;
+    int option = 0;
+    int fd;
+    struct tm *tm;
+    time_t t;
+    char buf[257]= {0};
+    int len;
+    char file_name[50] = {0};
 
-	t = time(NULL);
-	tm = localtime(&t);
+    t = time(NULL);
+    tm = localtime(&t);
 
-	mode_t mode;
-	mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+    mode_t mode;
+    mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 
-	if(argc<2) {
-		printf("인자 입력\n");
-		return 0;
-	}
-	else {
-		while( (option = getopt(argc, argv, "ca:edf") ) != -1) {
-			switch(option) {
-				case 'c':
-					opt_c++;
-					break;
-				case 'a':
-					opt_a++;
-					break;
-				case 'e':
-					opt_e++;
-					break;
-				case 'd':
-					opt_d++;
-					break;
-				case 'f':
-					opt_f++;
-					break;
-				default:
-					break;
-			}
-		}
-	}
+    if(argc<2) {
+        printf("인자 입력\n");
+        return 0;
+    }
+    else {
+        while( (option = getopt(argc, argv, "ca:edf") ) != -1) {
+            switch(option) {
+                case 'c':
+                    opt_c++;
+                    break;
+                case 'a':
+                    opt_a++;
+                    break;
+                case 'e':
+                    opt_e++;
+                    break;
+                case 'd':
+                    opt_d++;
+                    break;
+                case 'f':
+                    opt_f++;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 
-	if(opt_a) {
+    if(opt_a) {
 		switch(argc)
 		{
 			case 3:
@@ -102,6 +103,54 @@ int main(int argc, char *argv[]) {
 				close(fd);
 				break;
 		}
-	}
-	return 0;
+	} else if(opt_c) {
+        calendar();
+    }
+    return 0;
 }
+
+void calendar(){
+    struct tm *tm;
+    time_t t;
+    time(&t);
+    tm = localtime(&t);
+    //각 월별 날짜 수 저장
+    int month[12]={31,0,31,30,31,30,31,31,30,31,30,31};
+    int i,j,d,k;
+    int totalday=0;
+    int h=1;
+
+    int year=tm->tm_year+1900;
+    int _month=tm->tm_mon+1;
+
+    printf("%10d 년 %3d 월 \n", year, _month);
+    printf("------------------------------\n");
+    printf("  일  월  화  수  목  금  토  \n");
+    printf("------------------------------\n");
+    //윤년 체크
+    if(year%4==0&&year%100!=0||year%400==0){
+        month[1]=29;
+    }
+    else month[1]=28;
+
+    //시작일
+    totalday = (year-1)*365+(year-1)/4-(year-1)/100+(year-1)/400;
+    for(k=1;k<=_month-1;k++){
+        totalday=totalday+month[k-1];
+    }
+    //출력
+    for(i=1; i<=6; i++){
+        for(j=1;j<=7;j++,h++){
+            if(h<=month[_month-1]+1+totalday%7){
+                d=h-totalday%7;
+                if(d-1<=0)
+                    printf("    ");
+                else
+                    printf("%4d", d-1);
+            }
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
