@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 		printf("       n. 취소\n\n");
 		printf("  -f : 일정 검색\n");
 		printf("       년-월-일 입력 후 특정일자 검색\n");
-		printf("-------------------------------------------\n"):
+		printf("-------------------------------------------\n");
 		return 0;
 	}
 	else {
@@ -138,8 +138,9 @@ int main(int argc, char *argv[]) {
 			int sel=0;
 			int temp_line=0;
                         int line_num=1;
-			char sel_c='';
-			char edit_cont[100]={NULL,};
+			int line_num2=1;
+			char *sel_c;
+			char edit_cont[100]={0};
                         char temp[100] = {0};
                         while (read(fd, temp, 1) > 0 ) {
                                 if(temp[0] != '\n') {
@@ -154,21 +155,23 @@ int main(int argc, char *argv[]) {
                                         }
                                 }
                         }
-			printf("수정할항목 선택->");
+			
+			printf("수정할항목 선택\n->");
 			scanf("%d", &sel);
+			
 			if(sel>0&&sel<=line_num){
-				while(read(fd, temp,1)>0){
+				while(read(fd, temp, 1)>0){
 					if(temp[0]!='\n'){
 						buf[length]=temp[0];
 						length++;
 					}else{
 						length=0;
-						if(strncmp(argv[2], buf[10])==0){
-							if(line_num==sel){
-								printf("%d",line_num);
+						if(strncmp(argv[2], buf, 10)==0){
+							if(line_num2==sel){
+								printf("%d",line_num2);
 								puts(buf);
 							}
-							line_num++;
+							line_num2++;
 						}
 					}	
 				}
@@ -177,12 +180,12 @@ int main(int argc, char *argv[]) {
 				printf("t. 시간수정\n->");
 				scanf("%s",&sel_c);
 				printf("수정할 내용을 입력하세요\n");
-				if(strcmp("c",sel)==0){
+				if(strcmp("c",sel_c)==0){
 					printf("->");
 					scanf("%s",edit_cont);
 					
 				}
-				else if(strcmp("t",sel)==0){
+				else if(strcmp("t",sel_c)==0){
 					
 				}
 
