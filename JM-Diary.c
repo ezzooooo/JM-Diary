@@ -30,7 +30,26 @@ int main(int argc, char *argv[]) {
 	mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 
 	if(argc<2) {
-		printf("인자 입력\n");
+		printf("  	    인자를  입력하세요  	   \n");
+		printf("-------------------------------------------\n");
+		printf("  -c : 달력 보기\n\n");
+		printf("  -a : 일정 추가\n");
+		printf("       입력 형식\n");
+		printf("       1. '일자없이 작은따옴표 안 내용'\n");
+		printf("       2. 년-월-일 '내용'\n");
+		printf("       3. 년-월-일 시:분 '내용'\n\n");
+		printf("  -e : 일정 수정\n");
+		printf("       년-월-일 형태로 일자 선택 후\n");
+		printf("       수정할 항목 선택\n");
+		printf("       c. 내용 수정\n");
+		printf("       t. 시간 수정\n\n");
+		printf("  -d : 일정 삭제\n");
+		printf("       수정할 항목 선택 후\n");
+		printf("       y. 삭제\n");
+		printf("       n. 취소\n\n");
+		printf("  -f : 일정 검색\n");
+		printf("       년-월-일 입력 후 특정일자 검색\n");
+		printf("-------------------------------------------\n"):
 		return 0;
 	}
 	else {
@@ -105,6 +124,75 @@ int main(int argc, char *argv[]) {
 		}
 	} else if(opt_e) {
 		//수정메뉴
+		if(argc!=3) { 
+			printf("jmd -e 0000-00-00\n");
+		}
+		else {
+			sprintf(file_name, "%c%c%c%c-%c%c.txt", argv[2][0], argv[2][1], argv[2][2], argv[2][3], argv[2][5], argv[2][6]);
+			fd=open(file_name, O_RDWR, mode);
+			if(fd==-1){
+				perror("오픈 에러");
+				exit(1);
+			}
+			int length = 0;
+			int sel=0;
+			int temp_line=0;
+                        int line_num=1;
+			char sel_c='';
+			char edit_cont[100]={NULL,};
+                        char temp[100] = {0};
+                        while (read(fd, temp, 1) > 0 ) {
+                                if(temp[0] != '\n') {
+                                        buf[length]=temp[0];
+                                        length++;
+                                } else {
+                                        length=0;
+                                        if(strncmp(argv[2], buf, 10) == 0) {
+                                                printf("%d. ", line_num);
+                                                line_num++;
+                                                puts(buf);
+                                        }
+                                }
+                        }
+			printf("수정할항목 선택->");
+			scanf("%d", &sel);
+			if(sel>0&&sel<=line_num){
+				while(read(fd, temp,1)>0){
+					if(temp[0]!='\n'){
+						buf[length]=temp[0];
+						length++;
+					}else{
+						length=0;
+						if(strncmp(argv[2], buf[10])==0){
+							if(line_num==sel){
+								printf("%d",line_num);
+								puts(buf);
+							}
+							line_num++;
+						}
+					}	
+				}
+
+				printf("c. 내용수정\n");
+				printf("t. 시간수정\n->");
+				scanf("%s",&sel_c);
+				printf("수정할 내용을 입력하세요\n");
+				if(strcmp("c",sel)==0){
+					printf("->");
+					scanf("%s",edit_cont);
+					
+				}
+				else if(strcmp("t",sel)==0){
+					
+				}
+
+			}
+			else{
+				printf("존재하는 항목 중에 선택해주세요\n");
+			}
+			close(fd);
+
+		}
 	} else if(opt_d) {
 		//삭제메뉴
 	} else if(opt_f) {
