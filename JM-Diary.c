@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
 				sprintf(buf,"%04d-%02d-%02d %02d:%02d %s\n", 
 						tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday, 
 						tm->tm_hour, tm->tm_min, argv[2]);
-				if (write(fd, buf, strlen(buf)+1) != strlen(buf)+1)
+				if (write(fd, buf, strlen(buf)) != strlen(buf))
 					perror("쓰기 오류");
 				close(fd);
 				break;
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
 					exit(1);
 				}
 				sprintf(buf,"%s 09:00 %s\n", argv[2], argv[3]);
-				if (write(fd, buf, strlen(buf)+1) != strlen(buf)+1)
+				if (write(fd, buf, strlen(buf)) != strlen(buf))
 					perror("쓰기 오류");
 				close(fd);
 				break;
@@ -97,8 +97,8 @@ int main(int argc, char *argv[]) {
 					perror("오픈 에러");
 					exit(1);
 				}
-				sprintf(buf,"%s %s %s\n", argv[2], argv[3], argv[4]);
-				if (write(fd, buf, strlen(buf)+1) != strlen(buf)+1)
+				sprintf(buf,"%s %s %s", argv[2], argv[3], argv[4]);
+				if (write(fd, buf, strlen(buf)) != strlen(buf))
 					perror("쓰기 오류");
 				close(fd);
 				break;
@@ -108,7 +108,34 @@ int main(int argc, char *argv[]) {
 	} else if(opt_d) {
 		//삭제메뉴
 	} else if(opt_f) {
-		//조회메뉴
+		if(argc!=3) {
+			printf("jmd -f 0000-00-00\n");
+		} else {
+			sprintf(file_name,"%c%c%c%c-%c%c.txt", 
+					argv[2][0],argv[2][1], argv[2][2], argv[2][3], argv[2][5], argv[2][6]);
+			fd = open(file_name, O_RDONLY , mode);
+			if (fd == -1) {
+				perror("오픈 에러");
+				exit(1);
+			}
+			int length = 0;
+			int line_num=1;
+			char temp[100] = {0};
+			while (read(fd, temp, 1) > 0 ) {
+				if(temp[0] != '\n') {
+					buf[length]=temp[0];
+					length++;
+				} else {
+					length=0;
+					if(strncmp(argv[2], buf, 10) == 0) {
+						printf("%d. ", line_num);
+						line_num++;
+						puts(buf);
+					}
+				}
+			}
+			close(fd);
+		}
 	} else if(opt_c) {
 		calendar(); // 달력출력
 	}	
