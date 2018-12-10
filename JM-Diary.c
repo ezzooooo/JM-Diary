@@ -9,6 +9,8 @@
 
 void calendar();
 
+char init_arr[257] = {0};
+
 int main(int argc, char *argv[]) {
 	int opt_a = 0;
 	int opt_c = 0;
@@ -16,7 +18,7 @@ int main(int argc, char *argv[]) {
 	int opt_e = 0;
 	int opt_f = 0;
 	int option = 0;
-	int fd;
+	int fd, temp_fd;
 	struct tm *tm;
 	time_t t;
 	char buf[257]= {0};
@@ -44,7 +46,8 @@ int main(int argc, char *argv[]) {
 		printf("       c. 내용 수정\n");
 		printf("       t. 시간 수정\n\n");
 		printf("  -d : 일정 삭제\n");
-		printf("       수정할 항목 선택 후\n");
+		printf("       년-월-일 형태로 일자 선택 후\n");
+		printf("       삭제할 항목 선택 후\n");
 		printf("       y. 삭제\n");
 		printf("       n. 취소\n\n");
 		printf("  -f : 일정 검색\n");
@@ -53,7 +56,7 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 	else {
-		while( (option = getopt(argc, argv, "ca:edf") ) != -1) {
+		while( (option = getopt(argc, argv, "ca:e:d:f:") ) != -1) {
 			switch(option) {
 				case 'c':
 					opt_c++;
@@ -116,7 +119,7 @@ int main(int argc, char *argv[]) {
 					perror("오픈 에러");
 					exit(1);
 				}
-				sprintf(buf,"%s %s %s", argv[2], argv[3], argv[4]);
+				sprintf(buf,"%s %s %s\n", argv[2], argv[3], argv[4]);
 				if (write(fd, buf, strlen(buf)) != strlen(buf))
 					perror("쓰기 오류");
 				close(fd);
@@ -137,28 +140,28 @@ int main(int argc, char *argv[]) {
 			int length = 0;
 			int sel=0;
 			int temp_line=0;
-                        int line_num=1;
+			int line_num=1;
 			int line_num2=1;
 			char *sel_c;
 			char edit_cont[100]={0};
-                        char temp[100] = {0};
-                        while (read(fd, temp, 1) > 0 ) {
-                                if(temp[0] != '\n') {
-                                        buf[length]=temp[0];
-                                        length++;
-                                } else {
-                                        length=0;
-                                        if(strncmp(argv[2], buf, 10) == 0) {
-                                                printf("%d. ", line_num);
-                                                line_num++;
-                                                puts(buf);
-                                        }
-                                }
-                        }
-			
+			char temp[100] = {0};
+			while (read(fd, temp, 1) > 0 ) {
+				if(temp[0] != '\n') {
+					buf[length]=temp[0];
+					length++;
+				} else {
+					length=0;
+					if(strncmp(argv[2], buf, 10) == 0) {
+						printf("%d. ", line_num);
+						line_num++;
+						puts(buf);
+					}
+				}
+			}
+
 			printf("수정할항목 선택\n->");
 			scanf("%d", &sel);
-			
+
 			if(sel>0&&sel<=line_num){
 				while(read(fd, temp, 1)>0){
 					if(temp[0]!='\n'){
@@ -183,10 +186,10 @@ int main(int argc, char *argv[]) {
 				if(strcmp("c",sel_c)==0){
 					printf("->");
 					scanf("%s",edit_cont);
-					
+
 				}
 				else if(strcmp("t",sel_c)==0){
-					
+
 				}
 
 			}
@@ -197,7 +200,101 @@ int main(int argc, char *argv[]) {
 
 		}
 	} else if(opt_d) {
-		//삭제메뉴
+		if(argc!=3) {
+			printf("jmd -d 0000-00-00\n");
+		} else {
+			sprintf(file_name,"%c%c%c%c-%c%c.txt", 
+					argv[2][0],argv[2][1], argv[2][2], argv[2][3], argv[2][5], argv[2][6]);
+			fd = open(file_name, O_RDWR , mode);
+			if (fd == -1) {
+				perror("오픈 에러");
+				exit(1);
+			}
+
+			temp_fd = open("temp.txt", O_RDWR | O_CREAT, mode);
+			if (fd == -1) {
+				perror("오픈 에러");
+				exit(1);
+			}
+
+			int length = 0;
+			int line_num=0;
+			int file_line_num = 0;
+			int file_line_nums[100]={0};
+			int sel_line=0;
+			char temp[100] = {0};
+			while (read(fd, temp, 1) > 0 ) {
+				if(temp[0] != '\n') {
+					buf[length]=temp[0];
+					length++;
+				} else {
+					buf[length]='\0';
+					length=0;
+
+					file_line_num++;
+
+					if(strncmp(argv[2], buf, 10) == 0) {
+						file_line_nums[line_num]=file_line_num;
+						printf("%d. ", line_num+1);
+						line_num++;
+						puts(buf);
+					}
+				}
+			}
+
+			if(line_num == 0) {
+				printf("삭제할 항목이 없습니다.\n");
+				exit(1);
+			} else {
+				printf("삭제할 항목을 선택하세요\n->");
+
+				fflush(stdout);
+
+				scanf("%d", &sel_line);
+				length=0;
+
+				if(sel_line>=1 && sel_line<line_num+1) {
+					line_num = 0;
+					lseek(fd, 0, SEEK_SET);
+					while(read(fd, temp, 1)>0){
+						if(temp[0]!='\n'){
+							buf[length]=temp[0];
+							length++;
+						}else{
+							buf[length]='\0';
+							length=0;
+
+							line_num++;
+
+							if(line_num!=file_line_nums[sel_line-1]){
+								write(temp_fd, buf, strlen(buf));
+								write(temp_fd, "\n", 1);
+							}
+						}	
+					}
+
+					close(fd);
+					remove(file_name);
+
+					lseek(temp_fd, 0, SEEK_SET);
+
+					fd = open(file_name, O_CREAT | O_WRONLY, mode);
+					int n;
+					while((n =read(temp_fd, buf, 6)) > 0) {
+						if (write(fd, buf, n) != n)
+							perror("Write");
+					}
+					close(fd);
+					close(temp_fd);
+					remove("temp.txt");
+				}
+				else {
+					printf("삭제할 항목이 없습니다.\n");
+					exit(1);
+				}
+			}
+			close(fd);
+		}
 	} else if(opt_f) {
 		if(argc!=3) {
 			printf("jmd -f 0000-00-00\n");
