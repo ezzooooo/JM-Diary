@@ -133,11 +133,20 @@ int main(int argc, char *argv[]) {
 		}
 		else {
 			sprintf(file_name, "%c%c%c%c-%c%c.txt", argv[2][0], argv[2][1], argv[2][2], argv[2][3], argv[2][5], argv[2][6]);
+
 			fd = open(file_name, O_RDWR, mode);
+
 			if (fd == -1) {
 				perror("오픈 에러");
 				exit(1);
 			}
+
+			temp_fd = open("temp.txt", O_RDWR | O_CREAT, mode);
+			if (fd == -1) {
+				perror("오픈 에러");
+				exit(1);
+			}
+
 			int length = 0;
 			int line_num = 0;
 			int file_line_num = 0;
@@ -146,7 +155,8 @@ int main(int argc, char *argv[]) {
 			char edit_sel[5] = { 0 };
 			char edit_content[100] = { 0 };
 			char edit_time[100] = { 0 };
-			int edit_set=0;
+			char origin_cont[100] = { 0 };
+			int edit_set = 0;
 			char temp[100] = { 0 };
 			while (read(fd, temp, 1) > 0) {
 				if (temp[0] != '\n') {
@@ -218,18 +228,17 @@ int main(int argc, char *argv[]) {
 							}
 							else if (line_num == file_line_nums[sel_line - 1]) {	//수정하려는 줄일 경우
 								//입력한 내용으로 임시파일에 입력
-								if (edit_set==1) {
+								if (edit_set == 1) {
 									write(temp_fd, buf, 17);
-									write(temp_fd, "'", 1);
 									write(temp_fd, edit_content, strlen(edit_content));
-									write(temp_fd, "'", 1);
 									write(temp_fd, "\n", 1);
 								}
 								else if (edit_set == 2) {
+									strcpy(origin_cont, buf + 17);
 									write(temp_fd, buf, 11);
 									write(temp_fd, edit_time, strlen(edit_time));
 									lseek(temp_fd, 8, SEEK_CUR);
-									write(temp_fd, buf+17, strlen(buf)-17);
+									write(temp_fd, origin_cont, strlen(origin_cont));
 									write(temp_fd, "\n", 1);
 								}
 							}
@@ -259,7 +268,7 @@ int main(int argc, char *argv[]) {
 			close(fd);
 		}
 	}
-	else if (opt_d) {
+	else if (opt_d) {	//delete 삭제 옵션
 		if (argc != 3) {
 			printf("형식에 맞게 입력해주세요\n");
 			printf("jmd -d 0000-00-00\n");
@@ -361,12 +370,13 @@ int main(int argc, char *argv[]) {
 			close(fd);
 		}
 	}
-	else if (opt_f) {
+	else if (opt_f) {	//find 검색 옵션
 		if (argc != 3) {
 			printf("형식에 맞게 입력하세요\n");
 			printf("jmd -f 0000-00-00\n");
 		}
 		else {
+			//입력된 날짜 형식 기준 저장되어있는 파일 오픈
 			sprintf(file_name, "%c%c%c%c-%c%c.txt",
 				argv[2][0], argv[2][1], argv[2][2], argv[2][3], argv[2][5], argv[2][6]);
 			fd = open(file_name, O_RDONLY, mode);
@@ -391,7 +401,7 @@ int main(int argc, char *argv[]) {
 					}
 				}
 			}
-			if (line_num == 0) {
+			if (line_num == 1) {
 				printf("조회할 항목이 없습니다.\n");
 				exit(1);
 			}
@@ -404,6 +414,7 @@ int main(int argc, char *argv[]) {
 	return 0;
 }
 
+//달력 출력 함수
 void calendar() {
 	struct tm *tm;
 	time_t t;
