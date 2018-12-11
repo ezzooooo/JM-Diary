@@ -51,10 +51,36 @@ int main(int argc, char *argv[]) {
 		printf("       n. 취소\n\n");
 		printf("  -f : 일정 검색\n");
 		printf("       년-월-일 입력 후 특정일자 검색\n");
+		printf("--help: 옵션 설명\n");
 		printf("-------------------------------------------\n");
 		return 0;
 	}
 	else {
+		if (strcmp(argv[1], "--help") == 0) {
+			printf("  	    인자를  입력하세요  	   \n");
+			printf("-------------------------------------------\n");
+			printf("  -c : 달력 보기\n\n");
+			printf("  -a : 일정 추가\n");
+			printf("       입력 형식\n");
+			printf("       1. '일자없이 작은따옴표 안 내용'\n");
+			printf("       2. 년-월-일 '내용'\n");
+			printf("       3. 년-월-일 시:분 '내용'\n\n");
+			printf("  -e : 일정 수정\n");
+			printf("       년-월-일 형태로 일자 선택 후\n");
+			printf("       수정할 항목 선택\n");
+			printf("       c. 내용 수정\n");
+			printf("       t. 시간 수정\n\n");
+			printf("  -d : 일정 삭제\n");
+			printf("       년-월-일 형태로 일자 선택 후\n");
+			printf("       삭제할 항목 선택 후\n");
+			printf("       y. 삭제\n");
+			printf("       n. 취소\n\n");
+			printf("  -f : 일정 검색\n");
+			printf("       년-월-일 입력 후 특정일자 검색\n");
+			printf("--help: 옵션 설명\n");
+			printf("-------------------------------------------\n");
+			return 0;
+		}
 		while ((option = getopt(argc, argv, "ca:e:d:f:")) != -1) {
 			switch (option) {
 			case 'c':
@@ -78,7 +104,8 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	if (opt_a) { // 메모 입력 메뉴
+	// 메모 입력 옵션
+	if (opt_a) {
 		switch (argc)
 		{
 		case 3: // 인자가 3개일때 (JM-Diary -a '내용')
@@ -125,23 +152,25 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 	}
+
+	//메모 수정 옵션
 	else if (opt_e) {
-		//수정메뉴
 		if (argc != 3) {
 			printf("형식에 맞게 입력해주세요\n");
 			printf("jmd -e 0000-00-00\n");
 		}
 		else {
-			sprintf(file_name, "%c%c%c%c-%c%c.txt", argv[2][0], argv[2][1], argv[2][2], argv[2][3], argv[2][5], argv[2][6]);
+			//수정을 원하는 일자를 입력받아 해당 메모가 들어있는 파일을 오픈
+			sprintf(file_name, "%c%c%c%c-%c%c.txt", argv[2][0], argv[2][1], argv[2][2], argv[2][3], argv[2][5], argv[2][6]);	//입력된 일자의 년 월을 참조해 파일명 확보
 
-			fd = open(file_name, O_RDWR, mode);
+			fd = open(file_name, O_RDWR, mode);		//해당일자 파일 오픈
 
 			if (fd == -1) {
 				perror("오픈 에러");
 				exit(1);
 			}
 
-			temp_fd = open("temp.txt", O_RDWR | O_CREAT, mode);
+			temp_fd = open("temp.txt", O_RDWR | O_CREAT, mode);		//수정된 사항을 적용시킬 임시 파일
 			if (fd == -1) {
 				perror("오픈 에러");
 				exit(1);
@@ -158,6 +187,8 @@ int main(int argc, char *argv[]) {
 			char origin_cont[100] = { 0 };
 			int edit_set = 0;
 			char temp[100] = { 0 };
+
+			//현재 해당 일자에 입력되어 있는 메모 내용 전체 출력
 			while (read(fd, temp, 1) > 0) {
 				if (temp[0] != '\n') {
 					buf[length] = temp[0];
@@ -191,7 +222,7 @@ int main(int argc, char *argv[]) {
 				length = 0;
 
 				printf("-------------------------------\n");
-				printf("선택 하세요\n");
+				printf("선택 하세요\n\n");
 				printf("c. 내용 수정\n");
 				printf("t. 시간 수정\n");
 				printf("-------------------------------\n");
@@ -208,6 +239,11 @@ int main(int argc, char *argv[]) {
 					printf("수정할 시간을 입력하세요 (입력 형식 00:00)\n->");
 					scanf("%s", &edit_time);
 				}
+				else if (strcmp(edit_sel, "t") != 0 || strcmp(edit_sel, "c") != 0) {
+					printf("잘못 입력되었습니다.\n");
+					printf("다시 선택해주세요\n");
+					return 0;
+				}
 				if (sel_line >= 1 && sel_line < line_num + 1) {
 					line_num = 0;
 					lseek(fd, 0, SEEK_SET);
@@ -222,11 +258,13 @@ int main(int argc, char *argv[]) {
 
 							line_num++;
 
-							if (line_num != file_line_nums[sel_line - 1]) {			//수정하려는 줄이 아닌 경우
+							//수정하려는 줄이 아닌 경우
+							if (line_num != file_line_nums[sel_line - 1]) {			
 								write(temp_fd, buf, strlen(buf));
 								write(temp_fd, "\n", 1);
 							}
-							else if (line_num == file_line_nums[sel_line - 1]) {	//수정하려는 줄일 경우
+							//수정하려는 줄일 경우
+							else if (line_num == file_line_nums[sel_line - 1]) {	
 								//입력한 내용으로 임시파일에 입력
 								if (edit_set == 1) {
 									write(temp_fd, buf, 17);
@@ -237,7 +275,7 @@ int main(int argc, char *argv[]) {
 									strcpy(origin_cont, buf + 17);
 									write(temp_fd, buf, 11);
 									write(temp_fd, edit_time, strlen(edit_time));
-									lseek(temp_fd, 8, SEEK_CUR);
+									write(temp_fd, " ", 1);
 									write(temp_fd, origin_cont, strlen(origin_cont));
 									write(temp_fd, "\n", 1);
 								}
@@ -250,6 +288,7 @@ int main(int argc, char *argv[]) {
 
 					lseek(temp_fd, 0, SEEK_SET);
 
+					//본 파일에 수정된 내용을 덮어씌움
 					fd = open(file_name, O_CREAT | O_WRONLY, mode);
 					int n;
 					while ((n = read(temp_fd, buf, 6)) > 0) {
@@ -268,21 +307,24 @@ int main(int argc, char *argv[]) {
 			close(fd);
 		}
 	}
-	else if (opt_d) {	//delete 삭제 옵션
+	//delete 메모 삭제 옵션
+	else if (opt_d) {
 		if (argc != 3) {
 			printf("형식에 맞게 입력해주세요\n");
 			printf("jmd -d 0000-00-00\n");
 		}
 		else {
+			//삭제를 원하는 일자를 입력받아 해당 메모가 들어있는 파일을 오픈
 			sprintf(file_name, "%c%c%c%c-%c%c.txt",
-				argv[2][0], argv[2][1], argv[2][2], argv[2][3], argv[2][5], argv[2][6]);
-			fd = open(file_name, O_RDWR, mode);
+				argv[2][0], argv[2][1], argv[2][2], argv[2][3], argv[2][5], argv[2][6]);	//입력된 일자를 이용해 파일명 확보
+			
+			fd = open(file_name, O_RDWR, mode);		//해당 일자 메모가 들어있는 파일 오픈
 			if (fd == -1) {
 				perror("오픈 에러");
 				exit(1);
 			}
 
-			temp_fd = open("temp.txt", O_RDWR | O_CREAT, mode);
+			temp_fd = open("temp.txt", O_RDWR | O_CREAT, mode);		//삭제된 내용을 잠시 담을 임시파일 오픈
 			if (fd == -1) {
 				perror("오픈 에러");
 				exit(1);
@@ -340,7 +382,8 @@ int main(int argc, char *argv[]) {
 
 							line_num++;
 
-							if (line_num != file_line_nums[sel_line - 1]) {
+							//삭제를 원하는 내용을 제외한 나머지 내용을 임시파일에 담음
+							if (line_num != file_line_nums[sel_line - 1]) {	
 								write(temp_fd, buf, strlen(buf));
 								write(temp_fd, "\n", 1);
 							}
@@ -352,6 +395,7 @@ int main(int argc, char *argv[]) {
 
 					lseek(temp_fd, 0, SEEK_SET);
 
+					//임시 파일에 저장된 내용을 본 파일에 덮어 씌움
 					fd = open(file_name, O_CREAT | O_WRONLY, mode);
 					int n;
 					while ((n = read(temp_fd, buf, 6)) > 0) {
@@ -370,7 +414,8 @@ int main(int argc, char *argv[]) {
 			close(fd);
 		}
 	}
-	else if (opt_f) {	//find 검색 옵션
+	//find 메모 검색 옵션
+	else if (opt_f) {
 		if (argc != 3) {
 			printf("형식에 맞게 입력하세요\n");
 			printf("jmd -f 0000-00-00\n");
