@@ -1,4 +1,4 @@
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -9,7 +9,7 @@
 
 void calendar();
 
-char init_arr[257] = {0};
+char init_arr[257] = { 0 };
 
 int main(int argc, char *argv[]) {
 	int opt_a = 0;
@@ -21,9 +21,8 @@ int main(int argc, char *argv[]) {
 	int fd, temp_fd;
 	struct tm *tm;
 	time_t t;
-	char buf[257]= {0};
-	int len;
-	char file_name[50] = {0};
+	char buf[257] = { 0 };
+	char file_name[50] = { 0 };
 
 	t = time(NULL);
 	tm = localtime(&t);
@@ -31,7 +30,7 @@ int main(int argc, char *argv[]) {
 	mode_t mode;
 	mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 
-	if(argc<2) {
+	if (argc < 2) {
 		printf("  	    인자를  입력하세요  	   \n");
 		printf("-------------------------------------------\n");
 		printf("  -c : 달력 보기\n\n");
@@ -56,156 +55,219 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 	else {
-		while( (option = getopt(argc, argv, "ca:e:d:f:") ) != -1) {
-			switch(option) {
-				case 'c':
-					opt_c++;
-					break;
-				case 'a':
-					opt_a++;
-					break;
-				case 'e':
-					opt_e++;
-					break;
-				case 'd':
-					opt_d++;
-					break;
-				case 'f':
-					opt_f++;
-					break;
-				default:
-					break;
+		while ((option = getopt(argc, argv, "ca:e:d:f:")) != -1) {
+			switch (option) {
+			case 'c':
+				opt_c++;
+				break;
+			case 'a':
+				opt_a++;
+				break;
+			case 'e':
+				opt_e++;
+				break;
+			case 'd':
+				opt_d++;
+				break;
+			case 'f':
+				opt_f++;
+				break;
+			default:
+				break;
 			}
 		}
 	}
 
-	if(opt_a) { // 메모 입력 메뉴
-		switch(argc)
+	if (opt_a) { // 메모 입력 메뉴
+		switch (argc)
 		{
-			case 3: // 인자가 3개일때 (JM-Diary -a '내용')
-				t = time(NULL);
-				tm = localtime(&t);
-				sprintf(file_name,"%04d-%02d.txt", tm->tm_year+1900, tm->tm_mon+1);
-				fd = open(file_name, O_CREAT | O_APPEND | O_WRONLY , mode);
-				if (fd == -1) {
-					perror("오픈 에러");
-					exit(1);
-				}
-				sprintf(buf,"%04d-%02d-%02d %02d:%02d %s\n", 
-						tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday, 
-						tm->tm_hour, tm->tm_min, argv[2]);
-				if (write(fd, buf, strlen(buf)) != strlen(buf))
-					perror("쓰기 오류");
-				close(fd);
-				break;
-			case 4: // 인자가 4개일 때 (JM-Diary -a 2018-05-12 '내용')
-				sprintf(file_name,"%c%c%c%c-%c%c.txt", 
-						argv[2][0],argv[2][1], argv[2][2], argv[2][3], argv[2][5], argv[2][6]);
-				fd = open(file_name, O_CREAT | O_APPEND | O_WRONLY , mode);
-				if (fd == -1) {
-					perror("오픈 에러");
-					exit(1);
-				}
-				sprintf(buf,"%s 09:00 %s\n", argv[2], argv[3]);
-				if (write(fd, buf, strlen(buf)) != strlen(buf))
-					perror("쓰기 오류");
-				close(fd);
-				break;
-			case 5: // 인자가 5개일 때 (JM-Diary -a 2018-07-11 12:11 '내용')
-				sprintf(file_name,"%c%c%c%c-%c%c.txt", 
-						argv[2][0],argv[2][1], argv[2][2], argv[2][3], argv[2][5], argv[2][6]);
-				fd = open(file_name, O_CREAT | O_APPEND | O_WRONLY , mode);
-				if (fd == -1) {
-					perror("오픈 에러");
-					exit(1);
-				}
-				sprintf(buf,"%s %s %s\n", argv[2], argv[3], argv[4]);
-				if (write(fd, buf, strlen(buf)) != strlen(buf))
-					perror("쓰기 오류");
-				close(fd);
-				break;
+		case 3: // 인자가 3개일때 (JM-Diary -a '내용')
+			t = time(NULL);
+			tm = localtime(&t);
+			sprintf(file_name, "%04d-%02d.txt", tm->tm_year + 1900, tm->tm_mon + 1);
+			fd = open(file_name, O_CREAT | O_APPEND | O_WRONLY, mode);
+			if (fd == -1) {
+				perror("오픈 에러");
+				exit(1);
+			}
+			sprintf(buf, "%04d-%02d-%02d %02d:%02d %s\n",
+				tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
+				tm->tm_hour, tm->tm_min, argv[2]);
+			if (write(fd, buf, strlen(buf)) != strlen(buf))
+				perror("쓰기 오류");
+			close(fd);
+			break;
+		case 4: // 인자가 4개일 때 (JM-Diary -a 2018-05-12 '내용')
+			sprintf(file_name, "%c%c%c%c-%c%c.txt",
+				argv[2][0], argv[2][1], argv[2][2], argv[2][3], argv[2][5], argv[2][6]);
+			fd = open(file_name, O_CREAT | O_APPEND | O_WRONLY, mode);
+			if (fd == -1) {
+				perror("오픈 에러");
+				exit(1);
+			}
+			sprintf(buf, "%s 09:00 %s\n", argv[2], argv[3]);
+			if (write(fd, buf, strlen(buf)) != strlen(buf))
+				perror("쓰기 오류");
+			close(fd);
+			break;
+		case 5: // 인자가 5개일 때 (JM-Diary -a 2018-07-11 12:11 '내용')
+			sprintf(file_name, "%c%c%c%c-%c%c.txt",
+				argv[2][0], argv[2][1], argv[2][2], argv[2][3], argv[2][5], argv[2][6]);
+			fd = open(file_name, O_CREAT | O_APPEND | O_WRONLY, mode);
+			if (fd == -1) {
+				perror("오픈 에러");
+				exit(1);
+			}
+			sprintf(buf, "%s %s %s\n", argv[2], argv[3], argv[4]);
+			if (write(fd, buf, strlen(buf)) != strlen(buf))
+				perror("쓰기 오류");
+			close(fd);
+			break;
 		}
-	} else if(opt_e) {
+	}
+	else if (opt_e) {
 		//수정메뉴
-		if(argc!=3) { 
+		if (argc != 3) {
+			printf("형식에 맞게 입력해주세요\n");
 			printf("jmd -e 0000-00-00\n");
 		}
 		else {
 			sprintf(file_name, "%c%c%c%c-%c%c.txt", argv[2][0], argv[2][1], argv[2][2], argv[2][3], argv[2][5], argv[2][6]);
-			fd=open(file_name, O_RDWR, mode);
-			if(fd==-1){
+			fd = open(file_name, O_RDWR, mode);
+			if (fd == -1) {
 				perror("오픈 에러");
 				exit(1);
 			}
 			int length = 0;
-			int sel=0;
-			int temp_line=0;
-			int line_num=1;
-			int line_num2=1;
-			char *sel_c;
-			char edit_cont[100]={0};
-			char temp[100] = {0};
-			while (read(fd, temp, 1) > 0 ) {
-				if(temp[0] != '\n') {
-					buf[length]=temp[0];
+			int line_num = 0;
+			int file_line_num = 0;
+			int file_line_nums[100] = { 0 };
+			int sel_line = 0;
+			char edit_sel[5] = { 0 };
+			char edit_content[100] = { 0 };
+			char edit_time[100] = { 0 };
+			int edit_set=0;
+			char temp[100] = { 0 };
+			while (read(fd, temp, 1) > 0) {
+				if (temp[0] != '\n') {
+					buf[length] = temp[0];
 					length++;
-				} else {
-					length=0;
-					if(strncmp(argv[2], buf, 10) == 0) {
-						printf("%d. ", line_num);
+				}
+				else {
+					buf[length] = '\0';
+					length = 0;
+
+					file_line_num++;
+
+					if (strncmp(argv[2], buf, 10) == 0) {
+						file_line_nums[line_num] = file_line_num;
+						printf("%d. ", line_num + 1);
 						line_num++;
 						puts(buf);
 					}
 				}
 			}
 
-			printf("수정할항목 선택\n->");
-			scanf("%d", &sel);
-
-			if(sel>0&&sel<=line_num){
-				while(read(fd, temp, 1)>0){
-					if(temp[0]!='\n'){
-						buf[length]=temp[0];
-						length++;
-					}else{
-						length=0;
-						if(strncmp(argv[2], buf, 10)==0){
-							if(line_num2==sel){
-								printf("%d",line_num2);
-								puts(buf);
-							}
-							line_num2++;
-						}
-					}	
-				}
-
-				printf("c. 내용수정\n");
-				printf("t. 시간수정\n->");
-				scanf("%s",&sel_c);
-				printf("수정할 내용을 입력하세요\n");
-				if(strcmp("c",sel_c)==0){
-					printf("->");
-					scanf("%s",edit_cont);
-
-				}
-				else if(strcmp("t",sel_c)==0){
-
-				}
-
+			if (line_num == 0) {
+				printf("수정할 항목이 없습니다.\n");
+				exit(1);
 			}
-			else{
-				printf("존재하는 항목 중에 선택해주세요\n");
+			else {
+				printf("수정할 항목을 선택하세요\n->");
+
+				fflush(stdout);
+
+				scanf("%d", &sel_line);
+				length = 0;
+
+				printf("-------------------------------\n");
+				printf("선택 하세요\n");
+				printf("c. 내용 수정\n");
+				printf("t. 시간 수정\n");
+				printf("-------------------------------\n");
+				printf("->");
+				scanf("%s", &edit_sel);
+
+				if (strcmp(edit_sel, "c") == 0) {
+					edit_set = 1;
+					printf("수정할 내용을 입력하세요\n->");
+					scanf("%s", &edit_content);
+				}
+				else if (strcmp(edit_sel, "t") == 0) {
+					edit_set = 2;
+					printf("수정할 시간을 입력하세요 (입력 형식 00:00)\n->");
+					scanf("%s", &edit_time);
+				}
+				if (sel_line >= 1 && sel_line < line_num + 1) {
+					line_num = 0;
+					lseek(fd, 0, SEEK_SET);
+					while (read(fd, temp, 1) > 0) {
+						if (temp[0] != '\n') {
+							buf[length] = temp[0];
+							length++;
+						}
+						else {
+							buf[length] = '\0';
+							length = 0;
+
+							line_num++;
+
+							if (line_num != file_line_nums[sel_line - 1]) {			//수정하려는 줄이 아닌 경우
+								write(temp_fd, buf, strlen(buf));
+								write(temp_fd, "\n", 1);
+							}
+							else if (line_num == file_line_nums[sel_line - 1]) {	//수정하려는 줄일 경우
+								//입력한 내용으로 임시파일에 입력
+								if (edit_set==1) {
+									write(temp_fd, buf, 17);
+									write(temp_fd, "'", 1);
+									write(temp_fd, edit_content, strlen(edit_content));
+									write(temp_fd, "'", 1);
+									write(temp_fd, "\n", 1);
+								}
+								else if (edit_set == 2) {
+									write(temp_fd, buf, 11);
+									write(temp_fd, edit_time, strlen(edit_time));
+									lseek(temp_fd, 8, SEEK_CUR);
+									write(temp_fd, buf+17, strlen(buf)-17);
+									write(temp_fd, "\n", 1);
+								}
+							}
+						}
+					}
+
+					close(fd);
+					remove(file_name);
+
+					lseek(temp_fd, 0, SEEK_SET);
+
+					fd = open(file_name, O_CREAT | O_WRONLY, mode);
+					int n;
+					while ((n = read(temp_fd, buf, 6)) > 0) {
+						if (write(fd, buf, n) != n)
+							perror("Write");
+					}
+					close(fd);
+					close(temp_fd);
+					remove("temp.txt");
+				}
+				else {
+					printf("수정할 항목이 없습니다.\n");
+					exit(1);
+				}
 			}
 			close(fd);
-
 		}
-	} else if(opt_d) {
-		if(argc!=3) {
+	}
+	else if (opt_d) {
+		if (argc != 3) {
+			printf("형식에 맞게 입력해주세요\n");
 			printf("jmd -d 0000-00-00\n");
-		} else {
-			sprintf(file_name,"%c%c%c%c-%c%c.txt", 
-					argv[2][0],argv[2][1], argv[2][2], argv[2][3], argv[2][5], argv[2][6]);
-			fd = open(file_name, O_RDWR , mode);
+		}
+		else {
+			sprintf(file_name, "%c%c%c%c-%c%c.txt",
+				argv[2][0], argv[2][1], argv[2][2], argv[2][3], argv[2][5], argv[2][6]);
+			fd = open(file_name, O_RDWR, mode);
 			if (fd == -1) {
 				perror("오픈 에러");
 				exit(1);
@@ -218,59 +280,62 @@ int main(int argc, char *argv[]) {
 			}
 
 			int length = 0;
-			int line_num=0;
+			int line_num = 0;
 			int file_line_num = 0;
-			int file_line_nums[100]={0};
-			int sel_line=0;
-			char temp[100] = {0};
-			while (read(fd, temp, 1) > 0 ) {
-				if(temp[0] != '\n') {
-					buf[length]=temp[0];
+			int file_line_nums[100] = { 0 };
+			int sel_line = 0;
+			char temp[100] = { 0 };
+			while (read(fd, temp, 1) > 0) {
+				if (temp[0] != '\n') {
+					buf[length] = temp[0];
 					length++;
-				} else {
-					buf[length]='\0';
-					length=0;
+				}
+				else {
+					buf[length] = '\0';
+					length = 0;
 
 					file_line_num++;
 
-					if(strncmp(argv[2], buf, 10) == 0) {
-						file_line_nums[line_num]=file_line_num;
-						printf("%d. ", line_num+1);
+					if (strncmp(argv[2], buf, 10) == 0) {
+						file_line_nums[line_num] = file_line_num;
+						printf("%d. ", line_num + 1);
 						line_num++;
 						puts(buf);
 					}
 				}
 			}
 
-			if(line_num == 0) {
+			if (line_num == 0) {
 				printf("삭제할 항목이 없습니다.\n");
 				exit(1);
-			} else {
+			}
+			else {
 				printf("삭제할 항목을 선택하세요\n->");
 
 				fflush(stdout);
 
 				scanf("%d", &sel_line);
-				length=0;
+				length = 0;
 
-				if(sel_line>=1 && sel_line<line_num+1) {
+				if (sel_line >= 1 && sel_line < line_num + 1) {
 					line_num = 0;
 					lseek(fd, 0, SEEK_SET);
-					while(read(fd, temp, 1)>0){
-						if(temp[0]!='\n'){
-							buf[length]=temp[0];
+					while (read(fd, temp, 1) > 0) {
+						if (temp[0] != '\n') {
+							buf[length] = temp[0];
 							length++;
-						}else{
-							buf[length]='\0';
-							length=0;
+						}
+						else {
+							buf[length] = '\0';
+							length = 0;
 
 							line_num++;
 
-							if(line_num!=file_line_nums[sel_line-1]){
+							if (line_num != file_line_nums[sel_line - 1]) {
 								write(temp_fd, buf, strlen(buf));
 								write(temp_fd, "\n", 1);
 							}
-						}	
+						}
 					}
 
 					close(fd);
@@ -280,7 +345,7 @@ int main(int argc, char *argv[]) {
 
 					fd = open(file_name, O_CREAT | O_WRONLY, mode);
 					int n;
-					while((n =read(temp_fd, buf, 6)) > 0) {
+					while ((n = read(temp_fd, buf, 6)) > 0) {
 						if (write(fd, buf, n) != n)
 							perror("Write");
 					}
@@ -295,83 +360,91 @@ int main(int argc, char *argv[]) {
 			}
 			close(fd);
 		}
-	} else if(opt_f) {
-		if(argc!=3) {
+	}
+	else if (opt_f) {
+		if (argc != 3) {
+			printf("형식에 맞게 입력하세요\n");
 			printf("jmd -f 0000-00-00\n");
-		} else {
-			sprintf(file_name,"%c%c%c%c-%c%c.txt", 
-					argv[2][0],argv[2][1], argv[2][2], argv[2][3], argv[2][5], argv[2][6]);
-			fd = open(file_name, O_RDONLY , mode);
+		}
+		else {
+			sprintf(file_name, "%c%c%c%c-%c%c.txt",
+				argv[2][0], argv[2][1], argv[2][2], argv[2][3], argv[2][5], argv[2][6]);
+			fd = open(file_name, O_RDONLY, mode);
 			if (fd == -1) {
 				perror("오픈 에러");
 				exit(1);
 			}
 			int length = 0;
-			int line_num=1;
-			char temp[100] = {0};
-			while (read(fd, temp, 1) > 0 ) {
-				if(temp[0] != '\n') {
-					buf[length]=temp[0];
+			int line_num = 1;
+			char temp[100] = { 0 };
+			while (read(fd, temp, 1) > 0) {
+				if (temp[0] != '\n') {
+					buf[length] = temp[0];
 					length++;
-				} else {
-					length=0;
-					if(strncmp(argv[2], buf, 10) == 0) {
+				}
+				else {
+					length = 0;
+					if (strncmp(argv[2], buf, 10) == 0) {
 						printf("%d. ", line_num);
 						line_num++;
 						puts(buf);
 					}
 				}
 			}
+			if (line_num == 0) {
+				printf("조회할 항목이 없습니다.\n");
+				exit(1);
+			}
 			close(fd);
 		}
-	} else if(opt_c) {
+	}
+	else if (opt_c) {
 		calendar(); // 달력출력
-	}	
+	}
 	return 0;
 }
 
-void calendar(){
+void calendar() {
 	struct tm *tm;
 	time_t t;
 	time(&t);
 	tm = localtime(&t);
 	//각 월별 날짜 수 저장
-	int month[12]={31,0,31,30,31,30,31,31,30,31,30,31};
-	int i,j,d,k;
-	int totalday=0;
-	int h=1;
+	int month[12] = { 31,0,31,30,31,30,31,31,30,31,30,31 };
+	int i, j, d, k;
+	int totalday = 0;
+	int h = 1;
 
-	int year=tm->tm_year+1900;
-	int _month=tm->tm_mon+1;
+	int year = tm->tm_year + 1900;
+	int _month = tm->tm_mon + 1;
 
 	printf("%10d 년 %3d 월 \n", year, _month);
 	printf("------------------------------\n");
 	printf("  일  월  화  수  목  금  토  \n");
 	printf("------------------------------\n");
 	//윤년 체크
-	if(year%4==0&&year%100!=0||year%400==0){
-		month[1]=29;
+	if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0) {
+		month[1] = 29;
 	}
-	else month[1]=28;
+	else month[1] = 28;
 
 	//시작일
-	totalday = (year-1)*365+(year-1)/4-(year-1)/100+(year-1)/400;
-	for(k=1;k<=_month-1;k++){
-		totalday=totalday+month[k-1];
+	totalday = (year - 1) * 365 + (year - 1) / 4 - (year - 1) / 100 + (year - 1) / 400;
+	for (k = 1; k <= _month - 1; k++) {
+		totalday = totalday + month[k - 1];
 	}
 	//출력
-	for(i=1; i<=6; i++){
-		for(j=1;j<=7;j++,h++){
-			if(h<=month[_month-1]+1+totalday%7){
-				d=h-totalday%7;
-				if(d-1<=0)
+	for (i = 1; i <= 6; i++) {
+		for (j = 1; j <= 7; j++, h++) {
+			if (h <= month[_month - 1] + 1 + totalday % 7) {
+				d = h - totalday % 7;
+				if (d - 1 <= 0)
 					printf("    ");
 				else
-					printf("%4d", d-1);
+					printf("%4d", d - 1);
 			}
 		}
 		printf("\n");
 	}
 	printf("\n");
 }
-
